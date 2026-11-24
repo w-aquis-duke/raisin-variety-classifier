@@ -19,7 +19,7 @@ Training downloads the cleaned CSV, uses a 60/20/20 split, and saves the best lo
 
 ## Test the API
 
-After training, start the API with `python3 -m uvicorn app:app`. Open `http://127.0.0.1:8000/docs` for the API docs or run this in a second terminal.
+After training, start the API with `python3 -m uvicorn app:app`. Open [the prediction form](http://127.0.0.1:8000/) or [the API docs](http://127.0.0.1:8000/docs). To test the API directly, run this in a second terminal.
 
 ```bash
 curl -sS http://127.0.0.1:8000/predict -H 'Content-Type: application/json' \

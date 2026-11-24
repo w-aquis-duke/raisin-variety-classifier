@@ -2,6 +2,7 @@
 !app.py
 !config.yaml
 !dataset.py
+!index.html
 !requirements.txt
 !train.py
 !artifacts/
