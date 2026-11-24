@@ -1,0 +1,6 @@
+dataset_url: https://storage.googleapis.com/raisin-variety-classifier-data/raisins/clean-v1.csv
+dataset_sha256: a2e855f29eed1dcdd18f7c8a3bf008b323bb3e7bcb404ff7d02b2285f17d94d0
+random_seed: 42
+validation_fraction: 0.2
+test_fraction: 0.2
+model_c: 1.0
