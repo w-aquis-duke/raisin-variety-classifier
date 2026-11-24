@@ -17,6 +17,15 @@ python3 train.py
 
 Training downloads the cleaned CSV, uses a 60/20/20 split, and saves the best logistic regression pipeline to `artifacts/model.joblib`. Run `python3 dataset.py prepare` to rebuild the cleaned CSV.
 
+## Test the API
+
+After training, start the API with `python3 -m uvicorn app:app`. Open `http://127.0.0.1:8000/docs` for the API docs or run this in a second terminal.
+
+```bash
+curl -sS http://127.0.0.1:8000/predict -H 'Content-Type: application/json' \
+  -d '{"area_px":87524,"perimeter_px":1184.04,"major_axis_px":442.25,"minor_axis_px":253.29}'
+```
+
 ## Experiments
 
 MLflow records both validation runs and the winner’s confusion matrix. `C=0.1` won on validation and scored 0.866 macro-F1 and 86.7% accuracy on the test set.
