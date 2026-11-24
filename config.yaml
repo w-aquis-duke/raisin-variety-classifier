@@ -4,3 +4,4 @@ random_seed: 42
 validation_fraction: 0.2
 test_fraction: 0.2
 model_c: 1.0
+comparison_c: 0.1
