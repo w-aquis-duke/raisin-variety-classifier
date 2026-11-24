@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raisin Variety Classifier</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: clamp(1rem, 6vw, 4rem) 1rem;
+      background: #f4efe9;
+      color: #35252d;
+      font: 1rem/1.5 system-ui, sans-serif;
+    }
+    main {
+      max-width: 38rem;
+      margin: auto;
+      padding: clamp(1.25rem, 4vw, 2.5rem);
+      background: #fffdf9;
+      border: 1px solid #dfd5ce;
+      border-radius: 1rem;
+    }
+    h1 { margin: 0; font-size: clamp(1.75rem, 5vw, 2.4rem); line-height: 1.15; }
+    fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+    .examples, .measurements { gap: 0.75rem; margin-bottom: 1rem; }
+    .examples { display: flex; flex-wrap: wrap; }
+    .measurements { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    label { display: grid; gap: 0.3rem; font-weight: 600; }
+    input, button {
+      border: 1px solid #95838a;
+      border-radius: 0.5rem;
+      padding: 0.65rem 0.8rem;
+      color: inherit;
+      background: #fff;
+      font: inherit;
+    }
+    input { width: 100%; }
+    button { cursor: pointer; font-weight: 600; }
+    button:hover { background: #f5eff2; }
+    button:disabled { opacity: 0.6; cursor: default; }
+    .predict { width: 100%; color: #fff; background: #572942; border-color: #572942; }
+    .predict:hover { background: #482139; }
+    :focus-visible { outline: 3px solid #794360; outline-offset: 2px; }
+    #result { min-height: 1.5em; margin: 0.75rem 0; font-weight: 700; }
+    .note { margin-bottom: 0; color: #5e5157; font-size: 0.875rem; }
+    a { color: #572942; }
+    @media (max-width: 32rem) { .measurements { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Raisin Variety Classifier</h1>
+    <p>Enter four measurements or load an example to predict the variety.</p>
+
+    <form id="prediction-form">
+      <fieldset aria-label="Raisin measurements">
+        <div class="examples">
+          <button type="button" data-example="0">Example 1</button>
+          <button type="button" data-example="1">Example 2</button>
+        </div>
+        <div class="measurements">
+          <label>Area (pixel count)
+            <input name="area_px" type="number" min="0" step="any" required>
+          </label>
+          <label>Perimeter (px)
+            <input name="perimeter_px" type="number" min="0" step="any" required>
+          </label>
+          <label>Major axis (px)
+            <input name="major_axis_px" type="number" min="0" step="any" required>
+          </label>
+          <label>Minor axis (px)
+            <input name="minor_axis_px" type="number" min="0" step="any" required>
+          </label>
+        </div>
+        <button class="predict" type="submit">Predict</button>
+      </fieldset>
+    </form>
+
+    <p id="result" role="status"></p>
+    <p class="note">Predictions may vary with a different imaging setup. <a href="https://archive.ics.uci.edu/dataset/850/raisin">UCI Raisin dataset</a></p>
+  </main>
+
+  <script>
+    const form = document.querySelector("#prediction-form");
+    const controls = form.querySelector("fieldset");
+    const result = document.querySelector("#result");
+    const examples = [
+      { area_px: 39275, perimeter_px: 772.501, major_axis_px: 274.066, minor_axis_px: 185.411 },
+      { area_px: 160583, perimeter_px: 1646.559, major_axis_px: 630.645, minor_axis_px: 326.245 },
+    ];
+
+    for (const button of form.querySelectorAll("[data-example]")) {
+      button.addEventListener("click", () => {
+        for (const [name, value] of Object.entries(examples[button.dataset.example])) {
+          form.elements.namedItem(name).value = value;
+        }
+        result.textContent = "";
+      });
+    }
+
+    form.addEventListener("input", () => { result.textContent = ""; });
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const measurements = {};
+      for (const [name, value] of new FormData(form)) {
+        measurements[name] = Number(value);
+      }
+
+      controls.disabled = true;
+      result.textContent = "Predicting…";
+      try {
+        const response = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(measurements),
+        });
+        if (!response.ok) {
+          result.textContent = response.status === 422
+            ? "Enter a positive number for each measurement."
+            : "Prediction failed. Please try again.";
+          return;
+        }
+        const prediction = await response.json();
+        result.textContent = `Predicted variety: ${prediction.variety}`;
+      } catch {
+        result.textContent = "Could not reach the prediction API. Please try again.";
+      } finally {
+        controls.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

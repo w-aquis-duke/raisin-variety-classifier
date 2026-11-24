@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated, Literal
 
 import joblib
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from dataset import FEATURE_COLUMNS
@@ -34,6 +35,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Raisin Variety Classifier", lifespan=lifespan)
+
+
+@app.get("/", include_in_schema=False)
+def index():
+    return FileResponse(Path(__file__).with_name("index.html"))
 
 
 @app.exception_handler(RequestValidationError)
