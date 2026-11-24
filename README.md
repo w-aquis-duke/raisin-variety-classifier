@@ -2,6 +2,8 @@
 
 AIPI 510 project that predicts Kecimen or Besni from four shape measurements.
 
+[Live prediction form](https://raisin-classifier-808004316067.us-central1.run.app/) · [Live API docs](https://raisin-classifier-808004316067.us-central1.run.app/docs)
+
 ## Data
 
 We keep area, perimeter, major-axis length, and minor-axis length from 900 raisins measured by İlkay Çınar, Murat Koklu, and Sakir Tasdemir. [UCI Raisin dataset](https://archive.ics.uci.edu/dataset/850/raisin) · [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · [Cleaned CSV](https://storage.googleapis.com/raisin-variety-classifier-data/raisins/clean-v1.csv)
@@ -37,6 +39,12 @@ docker run --rm -p 127.0.0.1:8000:8080 -v "$PWD/artifacts/docker:/app/artifacts:
 
 Use the same `curl` request to test the container.
 
+## Deploy
+
+Train first so `artifacts/model.joblib` exists. With Docker and an authenticated Google Cloud CLI, run `bash deploy.sh` from the repo root. It pushes the image to Artifact Registry and deploys it to Cloud Run.
+
+The live revision `raisin-classifier-00001-v4p` serves the model from MLflow run `bc81c2d6479f476593b241e10a06a43a`. Its image digest is `sha256:12dd81a220aff2437c40a7f6c0c76038f7981e64887d1db62556ebb0b5862670`.
+
 ## Experiments
 
 MLflow records both validation runs and the winner’s confusion matrix. `C=0.1` won on validation and scored 0.866 macro-F1 and 86.7% accuracy on the test set.
@@ -46,3 +54,7 @@ Start the dashboard and open `http://127.0.0.1:5001`.
 ```bash
 mlflow server --backend-store-uri sqlite:///artifacts/mlflow.db --host 127.0.0.1 --port 5001
 ```
+
+## Limitations
+
+The model was trained on two raisin varieties measured with the study’s imaging setup. Different lighting, resolution, or varieties can change predictions. Errors in automated sorting could mislabel batches.
