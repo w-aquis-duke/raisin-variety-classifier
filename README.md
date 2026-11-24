@@ -26,6 +26,17 @@ curl -sS http://127.0.0.1:8000/predict -H 'Content-Type: application/json' \
   -d '{"area_px":87524,"perimeter_px":1184.04,"major_axis_px":442.25,"minor_axis_px":253.29}'
 ```
 
+## Docker
+
+```bash
+docker build -t raisin-classifier .
+mkdir -p artifacts/docker
+docker run --rm -v "$PWD/artifacts/docker:/app/artifacts" raisin-classifier python train.py
+docker run --rm -p 127.0.0.1:8000:8080 -v "$PWD/artifacts/docker:/app/artifacts:ro" raisin-classifier
+```
+
+Use the same `curl` request to test the container.
+
 ## Experiments
 
 MLflow records both validation runs and the winner’s confusion matrix. `C=0.1` won on validation and scored 0.866 macro-F1 and 86.7% accuracy on the test set.

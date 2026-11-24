@@ -1,0 +1,9 @@
+*
+!app.py
+!config.yaml
+!dataset.py
+!requirements.txt
+!train.py
+!artifacts/
+artifacts/*
+!artifacts/model.joblib
